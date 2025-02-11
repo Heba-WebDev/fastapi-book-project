@@ -3,7 +3,7 @@ name: Deploy API
 on:
   pull_request:
     types:
-      - open
+      - closed
     branches:
       - main
 
