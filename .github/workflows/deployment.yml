@@ -1,0 +1,42 @@
+name: Deploy API
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy via SSH
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            set -e  # Stop execution if any command fails
+            
+            # Navigate to project directory
+            cd /mnt/filestore/hng3/fastapi-book-project
+            
+            # Pull latest changes from GitHub
+            git pull origin main
+
+            # Activate virtual environment
+            source venv/bin/activate
+
+            # Install dependencies
+            pip install --no-cache-dir -r requirements.txt
+
+            # Restart FastAPI service
+            sudo systemctl restart fastapi.service
+          EOF
