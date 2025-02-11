@@ -13,14 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up SSH
+      - name: Set up SSH Key
         run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
-          eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/id_rsa
-
+              ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+              # Ensure the SSH agent is running
+              eval "$(ssh-agent -s)"
+              ssh-add ~/.ssh/id_rsa
       - name: Deploy via SSH
         run: |
           ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
