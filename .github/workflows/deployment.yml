@@ -1,4 +1,4 @@
-name: Deploy API
+name: deploy
 
 on:
   pull_request:
