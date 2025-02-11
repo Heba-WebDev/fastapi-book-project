@@ -15,11 +15,13 @@ jobs:
     steps:
       - name: Set up SSH Key
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.VPS_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
-
+              mkdir -p ~/.ssh
+              echo "${{ secrets.VPS_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+              chmod 600 ~/.ssh/id_rsa
+              ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+              # Ensure the SSH agent is running
+              eval "$(ssh-agent -s)"
+              ssh-add ~/.ssh/id_rsa
       - name: Deploy via SSH
         run: |
           ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
